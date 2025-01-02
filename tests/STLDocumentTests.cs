@@ -34,6 +34,19 @@ namespace QuantumConcepts.Formats.StereoLithography.Test
         }
 
         [Fact]
+        public void Read__FromBinaryStreamWithSolidHeader()
+        {
+            STLDocument stlBinary;
+
+            using (var stream = GetData("BinaryWithSolidHeader.stl"))
+            {
+                stlBinary = STLDocument.Read(stream);
+            }
+
+            ValidateSTL(stlBinary);
+        }
+
+        [Fact]
         public void Read__FromTextReader()
         {
             STLDocument stl;

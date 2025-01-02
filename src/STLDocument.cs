@@ -125,22 +125,7 @@ namespace QuantumConcepts.Formats.StereoLithography
         /// <returns>True if the <see cref="STLDocument"/> is text-based, otherwise false.</returns>
         public static bool IsText(Stream stream)
         {
-            if (stream == null) throw new NullReferenceException(nameof(stream));
-
-            const string solid = "solid";
-
-            byte[] buffer = new byte[5];
-            string header;
-
-            // Reset the stream to tbe beginning and read the first few bytes, then reset the stream to the beginning again.
-            stream.Seek(0, SeekOrigin.Begin);
-            stream.Read(buffer, 0, buffer.Length);
-            stream.Seek(0, SeekOrigin.Begin);
-
-            // Read the header as ASCII.
-            header = Encoding.ASCII.GetString(buffer);
-
-            return solid.Equals(header, StringComparison.InvariantCultureIgnoreCase);
+            return !IsBinary(stream);
         }
 
         /// <summary>Determines if the <see cref="STLDocument"/> contained within the <paramref name="stream"/> is binary-based.</summary>
@@ -149,7 +134,19 @@ namespace QuantumConcepts.Formats.StereoLithography
         /// <returns>True if the <see cref="STLDocument"/> is binary-based, otherwise false.</returns>
         public static bool IsBinary(Stream stream)
         {
-            return !IsText(stream);
+            if (stream == null) throw new NullReferenceException(nameof(stream));
+
+            using var reader = new BinaryReader(stream, Encoding.Default, true);
+
+            stream.Seek(80, SeekOrigin.Begin);
+
+            var numTriangles = reader.ReadUInt32();
+
+            var expectedSize = 84 + numTriangles * 50;
+
+            stream.Seek(0, SeekOrigin.Begin);
+
+            return stream.Length == expectedSize;
         }
 
         /// <summary>Reads the <see cref="STLDocument"/> contained within the <paramref name="stream"/> into a new <see cref="STLDocument"/>.</summary>
