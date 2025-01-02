@@ -140,9 +140,8 @@ namespace QuantumConcepts.Formats.StereoLithography
 
             stream.Seek(80, SeekOrigin.Begin);
 
-            var numTriangles = reader.ReadUInt32();
-
-            var expectedSize = 84 + numTriangles * 50;
+            const numTriangles = reader.ReadUInt32();
+            const expectedSize = 84 + numTriangles * 50;
 
             stream.Seek(0, SeekOrigin.Begin);
 
